@@ -3,8 +3,28 @@ import { useRecipes } from '../hooks/useRecipes';
 import HeroSection from '../components/home/HeroSection';
 import FeaturedMakananSection from '../components/home/FeaturedMakananSection';
 import FeaturedMinumanSection from '../components/home/FeaturedMinumanSection';
+import { useEffect } from 'react'; // <--- TAMBAHKAN INI
 
 export default function HomePage({ onRecipeClick, onNavigate }) {
+  // --- LOGIKA BARU UNTUK MEMBACA URL PARAMETERS (SHARE LINK) ---
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const recipeId = params.get('recipe');
+    const category = params.get('category');
+
+    if (recipeId && category) {
+      // 1. Panggil prop onRecipeClick untuk memicu perpindahan ke RecipeDetailPage
+      // Asumsi onRecipeClick(id, category) akan mengubah state di parent component
+      onRecipeClick(recipeId, category);
+
+      // 2. Hapus parameter dari URL agar browser URL terlihat bersih
+      const cleanUrl = window.location.origin + window.location.pathname;
+      window.history.replaceState(null, '', cleanUrl);
+    }
+  }, [onRecipeClick]); // onRecipeClick dimasukkan ke dependency array
+
+  // -----------------------------------------------------------
+
   // Fetch featured makanan (food) recipes from API
   const { 
     recipes: featuredMakanan, 
@@ -55,4 +75,3 @@ export default function HomePage({ onRecipeClick, onNavigate }) {
     </div>
   );
 }
-
